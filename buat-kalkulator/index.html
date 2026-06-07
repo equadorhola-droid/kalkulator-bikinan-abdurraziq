@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Kalkulator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f8fafc;
+            transition: background 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        body.dark {
+            background: #1e293b;
+        }
+
+        
+        @keyframes fadeOut {
+            from { opacity: 1; visibility: visible; }
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+      
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #2563eb; /* Warna background loading */
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            animation: fadeOut 0.5s forwards 1.5s; /* Hilang setelah 1.5 detik */
+        }
+
+        .app {
+            width: 100%;
+            max-width: 360px;
+            padding: 1rem;
+            opacity: 0;
+            animation: fadeInUp 0.6s ease-out forwards 1.7s;
+        }
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        body.dark .header {
+            border-bottom-color: #334155;
+        }
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #1e293b;
+            letter-spacing: -0.025em;
+        }
+        body.dark .header h1 {
+            color: #f1f5f9;
+        }
+
+        /* THEME TOGGLE */
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        body.dark .theme-toggle {
+            border-color: #475569;
+            background: #334155;
+        }
+        .theme-toggle:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        body.dark .theme-toggle:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .sun { display: block; }
+        .moon { display: none; }
+        body.dark .sun { display: none; }
+        body.dark .moon { display: block; }
+
+        /* DISPLAY */
+        .display {
+            margin-bottom: 1.5rem;
+        }
+        #layar {
+            width: 100%;
+            height: 80px;
+            padding: 1rem 1.25rem;
+            font-size: 2.25rem;
+            font-weight: 500;
+            text-align: right;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            color: #1e293b;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+        body.dark #layar {
+            border-color: #475569;
+            background: #334155;
+            color: #f1f5f9;
+        }
+        #layar::placeholder {
+            color: #94a3b8;
+        }
+        .calc-container {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+        body.dark .calc-container {
+            background: #1e293b;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .span-2 {
+            grid-column: span 2;
+        }
+        button {
+            height: 64px;
+            border: none;
+            border-radius: 16px;
+            font-size: 1.5rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: #f8fafc;
+            color: #475569;
+        }
+        body.dark button {
+            background: #475569;
+            color: #e2e8f0;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        body.dark button:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+        }
+        .equals {
+            background: #3b82f6 !important;
+            color: white !important;
+            font-size: 1.75rem;
+            font-weight: 600;
+        }
+        .equals:hover {
+            background: #2563eb !important;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 35px rgba(59, 130, 246, 0.4);
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+        .clear {
+            flex: 1;
+            background: #f1f5f9 !important;
+            color: #64748b !important;
+            font-weight: 600;
+            font-size: 1.125rem;
+        }
+        body.dark .clear {
+            background: #475569 !important;
+            color: #94a3b8 !important;
+        }
+        .clear:hover {
+            background: #e2e8f0 !important;
+            transform: translateY(-1px);
+        }
+        body.dark .clear:hover {
+            background: #594d67 !important;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .app {
+                padding: 0.5rem;
+            }
+            .calc-container {
+                padding: 1.5rem;
+            }
+            .grid {
+                gap: 0.75rem;
+            }
+            button {
+                height: 56px;
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    
+    <div class="loading">
+        <div>Loading...</div>
+    </div>
+
+
+    <div class="app">
+        <div class="calc-container">
+            <div class="header">
+                <h1>Calculator</h1>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                    <span class="sun">☀️</span>
+                    <span class="moon">🌙</span>
+                </button>
+            </div>
+            <div class="display">
+                <input id="layar" value="" placeholder="0" readonly>
+            </div>
+            <div class="grid">
+                <button onclick="tambahangka('7')">7</button>
+                <button onclick="tambahangka('8')">8</button>
+                <button onclick="tambahangka('9')">9</button>
+                <button onclick="tambahangka('/')">/</button>
+                <button onclick="tambahangka('4')">4</button>
+                <button onclick="tambahangka('5')">5</button> <button onclick="tambahangka('6')">6</button>
+                <button onclick="tambahangka('*')">*</button>
+                <button onclick="tambahangka('1')">1</button>
+                <button onclick="tambahangka('2')">2</button>
+                <button onclick="tambahangka('3')">3</button>
+                <button onclick="tambahangka('-')">-</button>
+                <button onclick="tambahangka('0')" class="span-2">0</button>
+                <button onclick="tambahangka('.')">.</button>
+                <button onclick="samadengan()" class="equals">=</button>
+            </div>
+            <div class="actions">
+                <button class="clear" onclick="hapuslayar()">C</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let isDark = false;
+        function tambahangka(bilangan) {
+            let layar = document.getElementById("layar");
+            layar.value += bilangan;
+        }
+        function samadengan() {
+            let layar = document.getElementById("layar");
+            try {
+                layar.value = eval(layar.value.replace(/×/g, '*'));
+            } catch (e) {
+                layar.value = "Error";
+                setTimeout(() => layar.value = "", 1500);
+            }
+        }
+        function hapuslayar() {
+            document.getElementById("layar").value = "";
+        }
+        function toggleTheme() {
+            isDark = !isDark;
+            document.body.classList.toggle('dark', isDark);
+            localStorage.setItem('darkMode', isDark);
+        }
+        if (localStorage.getItem('darkMode') === 'true') {
+            isDark = true;
+            document.body.classList.add('dark');
+        }
+    </script>
+</body>
+</html>
